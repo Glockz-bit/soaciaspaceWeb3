@@ -1,0 +1,39 @@
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+contract SocialMedia {
+    // Define the NFT contract interface
+    IERC721 public nftContract;
+
+      // Define a mapping of NFT IDs to user addresses   
+      mapping(uint256 => address) public nftOwners;    
+
+       // Define an event to emit when a user sends a message   
+      event MessageSent(address indexed sender, string message);      
+
+        // Constructor function that takes the address of the NFT contract as an argument   
+       constructor(address _nftContract)
+      {        nftContract = IERC721(_nftContract);   
+         
+
+         function sendMesssage(string memory _message) public {
+              // Get the ID of the NFT owned by the sender
+             uint256 nftId = nftContract.tokenOfOwnerByIndex(msg.sender, 0);
+             // Check if the sender owns the required NFT      
+              require(nftOwners[nftId] == msg.sender, "You do not own the required NFT to send messages.");
+             // Emit the MessageSent event
+            emit MessageSent(msg.sender, _message);
+
+         }
+
+          // Function to allow NFT owners to grant permission to other users to send messages on their behalf
+            function grantPermission(uint256 _nftId, address _user) public {
+
+                 // Check that the sender owns the specified NFT
+                  require(nftOwners[_nftId] == msg.sender, "You do not own the specified NFT.");
+
+                   // Grant permission to the specified user
+                    nftOwners[_nftId] = _user;
+       }
+      }
